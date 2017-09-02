@@ -4,20 +4,29 @@ namespace Trivia
 {
     public class Players
     {
-        public List<string> players = new List<string>();
-        public int[] places = new int[6];
-        public int[] purses = new int[6];
-        public bool[] inPenaltyBox = new bool[6];
-        public int currentPlayer = 0;
+        private int currentPlayer = 0;
+
+        public List<Player> _players = new List<Player>();
 
         public void AddPlayerName(string playerName)
         {
-            players.Add(playerName);
+            _players.Add(new Player {Name = playerName});
         }
 
         public int Count()
         {
-            return this.players.Count;
+            return _players.Count;
+        }
+
+        public void NextPlayer()
+        {
+            currentPlayer++;
+            if (currentPlayer == Count()) currentPlayer = 0;
+        }
+
+        public Player CurrentPlayer()
+        {
+            return _players[currentPlayer];
         }
     }
 }

@@ -22,14 +22,9 @@ namespace Trivia
                 popQuestions.AddLast("Pop Question " + i);
                 scienceQuestions.AddLast(("Science Question " + i));
                 sportsQuestions.AddLast(("Sports Question " + i));
-                rockQuestions.AddLast(createRockQuestion(i));
+                rockQuestions.AddLast("Rock Question " + i);
             }
             _players = new Players();
-        }
-
-        public String createRockQuestion(int index)
-        {
-            return "Rock Question " + index;
         }
 
         public bool add(String playerName)
@@ -43,39 +38,38 @@ namespace Trivia
 
         public void roll(int roll)
         {
-            Console.WriteLine(_players.players[_players.currentPlayer] + " is the current player");
+            Console.WriteLine(_players.CurrentPlayer().Name + " is the current player");
             Console.WriteLine("They have rolled a " + roll);
 
-            if (_players.inPenaltyBox[_players.currentPlayer])
+            if (_players.CurrentPlayer().IsPenaltized)
             {
                 if (roll % 2 != 0)
                 {
                     isGettingOutOfPenaltyBox = true;
 
-                    Console.WriteLine(_players.players[_players.currentPlayer] + " is getting out of the penalty box");
-                    _players.places[_players.currentPlayer] = _players.places[_players.currentPlayer] + roll;
-                    if (_players.places[_players.currentPlayer] > 11) _players.places[_players.currentPlayer] = _players.places[_players.currentPlayer] - 12;
+                    Console.WriteLine(_players.CurrentPlayer().Name + " is getting out of the penalty box");
 
-                    Console.WriteLine(_players.players[_players.currentPlayer]
+                    _players.CurrentPlayer().Move(roll);
+
+                    Console.WriteLine(_players.CurrentPlayer().Name
                                       + "'s new location is "
-                                      + _players.places[_players.currentPlayer]);
+                                      + _players.CurrentPlayer().Place);
                     Console.WriteLine("The category is " + currentCategory());
                     askQuestion();
                 }
                 else
                 {
-                    Console.WriteLine(_players.players[_players.currentPlayer] + " is not getting out of the penalty box");
+                    Console.WriteLine(_players.CurrentPlayer().Name + " is not getting out of the penalty box");
                     isGettingOutOfPenaltyBox = false;
                 }
             }
             else
             {
-                _players.places[_players.currentPlayer] = _players.places[_players.currentPlayer] + roll;
-                if (_players.places[_players.currentPlayer] > 11) _players.places[_players.currentPlayer] = _players.places[_players.currentPlayer] - 12;
+                _players.CurrentPlayer().Move(roll);
 
-                Console.WriteLine(_players.players[_players.currentPlayer]
+                Console.WriteLine(_players.CurrentPlayer().Name
                                   + "'s new location is "
-                                  + _players.places[_players.currentPlayer]);
+                                  + _players.CurrentPlayer().Place);
                 Console.WriteLine("The category is " + currentCategory());
                 askQuestion();
             }
@@ -105,59 +99,60 @@ namespace Trivia
             }
         }
 
-
         private String currentCategory()
         {
-            if (_players.places[_players.currentPlayer] == 0) return "Pop";
-            if (_players.places[_players.currentPlayer] == 4) return "Pop";
-            if (_players.places[_players.currentPlayer] == 8) return "Pop";
-            if (_players.places[_players.currentPlayer] == 1) return "Science";
-            if (_players.places[_players.currentPlayer] == 5) return "Science";
-            if (_players.places[_players.currentPlayer] == 9) return "Science";
-            if (_players.places[_players.currentPlayer] == 2) return "Sports";
-            if (_players.places[_players.currentPlayer] == 6) return "Sports";
-            if (_players.places[_players.currentPlayer] == 10) return "Sports";
+            Dictionary<int, string> categoryMapping = new Dictionary<int, string>
+            {
+                {0, "Pop"},
+                {4, "Pop"},
+                {8, "Pop"},
+                {1, "Science"},
+                {5, "Science"},
+                {9, "Science"},
+                {2, "Sports"},
+                {6, "Sports"},
+                {10, "Sports"},
+            };
+
+            if (categoryMapping.ContainsKey(_players.CurrentPlayer().Place))
+                return categoryMapping[_players.CurrentPlayer().Place];
             return "Rock";
         }
 
         public bool wasCorrectlyAnswered()
         {
-            if (_players.inPenaltyBox[_players.currentPlayer])
+            if (_players.CurrentPlayer().IsPenaltized)
             {
                 if (isGettingOutOfPenaltyBox)
                 {
                     Console.WriteLine("Answer was correct!!!!");
-                    _players.purses[_players.currentPlayer]++;
-                    Console.WriteLine(_players.players[_players.currentPlayer]
+                    _players.CurrentPlayer().WonCoin();
+                    Console.WriteLine(_players.CurrentPlayer().Name
                                       + " now has "
-                                      + _players.purses[_players.currentPlayer]
+                                      + _players.CurrentPlayer().Purse
                                       + " Gold Coins.");
 
                     bool winner = didPlayerWin();
-                    _players.currentPlayer++;
-                    if (_players.currentPlayer == _players.Count()) _players.currentPlayer = 0;
-
+                    _players.NextPlayer();
                     return winner;
                 }
                 else
                 {
-                    _players.currentPlayer++;
-                    if (_players.currentPlayer == _players.Count()) _players.currentPlayer = 0;
+                    _players.NextPlayer();
                     return true;
                 }
             }
             else
             {
                 Console.WriteLine("Answer was correct!!!!");
-                _players.purses[_players.currentPlayer]++;
-                Console.WriteLine(_players.players[_players.currentPlayer]
+                _players.CurrentPlayer().WonCoin();
+                Console.WriteLine(_players.CurrentPlayer().Name
                                   + " now has "
-                                  + _players.purses[_players.currentPlayer]
+                                  + _players.CurrentPlayer().Purse
                                   + " Gold Coins.");
 
                 bool winner = didPlayerWin();
-                _players.currentPlayer++;
-                if (_players.currentPlayer == _players.Count()) _players.currentPlayer = 0;
+                _players.NextPlayer();
 
                 return winner;
             }
@@ -166,18 +161,17 @@ namespace Trivia
         public bool wrongAnswer()
         {
             Console.WriteLine("Question was incorrectly answered");
-            Console.WriteLine(_players.players[_players.currentPlayer] + " was sent to the penalty box");
-            _players.inPenaltyBox[_players.currentPlayer] = true;
+            Console.WriteLine(_players.CurrentPlayer().Name + " was sent to the penalty box");
+            _players.CurrentPlayer().SetPenaltized();
 
-            _players.currentPlayer++;
-            if (_players.currentPlayer == _players.Count()) _players.currentPlayer = 0;
+            _players.NextPlayer();
             return true;
         }
 
 
         private bool didPlayerWin()
         {
-            return !(_players.purses[_players.currentPlayer] == 6);
+            return !(_players.CurrentPlayer().Purse == 6);
         }
     }
 }
