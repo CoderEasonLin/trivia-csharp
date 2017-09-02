@@ -32,11 +32,6 @@ namespace Trivia
             return "Rock Question " + index;
         }
 
-        public bool isPlayable()
-        {
-            return (howManyPlayers() >= 2);
-        }
-
         public bool add(String playerName)
         {
             _players.AddPlayerName(playerName);
@@ -44,11 +39,6 @@ namespace Trivia
             Console.WriteLine(playerName + " was added");
             Console.WriteLine("They are player number " + _players.Count());
             return true;
-        }
-
-        public int howManyPlayers()
-        {
-            return _players.Count();
         }
 
         public void roll(int roll)
