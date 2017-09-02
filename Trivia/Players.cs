@@ -9,5 +9,15 @@ namespace Trivia
         public int[] purses = new int[6];
         public bool[] inPenaltyBox = new bool[6];
         public int currentPlayer = 0;
+
+        public void AddPlayerName(string playerName)
+        {
+            players.Add(playerName);
+        }
+
+        public int Count()
+        {
+            return this.players.Count;
+        }
     }
 }

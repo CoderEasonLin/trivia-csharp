@@ -39,19 +39,16 @@ namespace Trivia
 
         public bool add(String playerName)
         {
-            _players.players.Add(playerName);
-            _players.places[howManyPlayers()] = 0;
-            _players.purses[howManyPlayers()] = 0;
-            _players.inPenaltyBox[howManyPlayers()] = false;
+            _players.AddPlayerName(playerName);
 
             Console.WriteLine(playerName + " was added");
-            Console.WriteLine("They are player number " + _players.players.Count);
+            Console.WriteLine("They are player number " + _players.Count());
             return true;
         }
 
         public int howManyPlayers()
         {
-            return _players.players.Count;
+            return _players.Count();
         }
 
         public void roll(int roll)
@@ -148,14 +145,14 @@ namespace Trivia
 
                     bool winner = didPlayerWin();
                     _players.currentPlayer++;
-                    if (_players.currentPlayer == _players.players.Count) _players.currentPlayer = 0;
+                    if (_players.currentPlayer == _players.Count()) _players.currentPlayer = 0;
 
                     return winner;
                 }
                 else
                 {
                     _players.currentPlayer++;
-                    if (_players.currentPlayer == _players.players.Count) _players.currentPlayer = 0;
+                    if (_players.currentPlayer == _players.Count()) _players.currentPlayer = 0;
                     return true;
                 }
             }
@@ -170,7 +167,7 @@ namespace Trivia
 
                 bool winner = didPlayerWin();
                 _players.currentPlayer++;
-                if (_players.currentPlayer == _players.players.Count) _players.currentPlayer = 0;
+                if (_players.currentPlayer == _players.Count()) _players.currentPlayer = 0;
 
                 return winner;
             }
@@ -183,7 +180,7 @@ namespace Trivia
             _players.inPenaltyBox[_players.currentPlayer] = true;
 
             _players.currentPlayer++;
-            if (_players.currentPlayer == _players.players.Count) _players.currentPlayer = 0;
+            if (_players.currentPlayer == _players.Count()) _players.currentPlayer = 0;
             return true;
         }
 
